@@ -1677,6 +1677,7 @@ const Chain = Chainf;
                 this.ygridHeight = this.height / this.ygrid;
                 this.lastCycle = undefined;
                 this.cycleSpeed = 1000 / c.gameSpeed / 30;
+				this.lagComp = 1;
                 this.gameMode = config.MODE;
                 this.testingMode = c.testingMode;
                 this.speed = c.gameSpeed;
@@ -7206,18 +7207,18 @@ const Chain = Chainf;
                 this.vfacing = util.angleDifference(oldFacing, this.facing) * room.speed;
             }
             physics() {
-                this.velocity.x += this.accel.x;
-                this.velocity.y += this.accel.y;
+                this.velocity.x += this.accel.x*room.lagComp;
+                this.velocity.y += this.accel.y*room.lagComp;
                 this.accel.null();
                 this.stepRemaining = c.ARENA_TYPE === 1 ? 1.5 : 1;
-                this.x += this.stepRemaining * this.velocity.x / room.speed;
-                this.y += this.stepRemaining * this.velocity.y / room.speed;
+                this.x += (this.stepRemaining * this.velocity.x / room.speed)*room.lagComp;
+                this.y += (this.stepRemaining * this.velocity.y / room.speed)*room.lagComp;
             }
             friction() {
                 let motion = this.velocity.length,
                     excess = (motion - this.maxSpeed) * (c.ARENA_TYPE === 1 ? 1.05 : 1);
                 if (excess > 0 && this.damp) {
-                    let drag = excess / (this.damp / room.speed + 1),
+                    let drag = excess / ((this.damp / room.speed + 1)*room.lagComp),
                         finalvelocity = this.maxSpeed + drag;
                     this.velocity.x = finalvelocity * this.velocity.x / motion;
                     this.velocity.y = finalvelocity * this.velocity.y / motion;
@@ -11263,6 +11264,7 @@ function flatten(data, out, playerContext = null) {
                 }*/
                 room.lastCycle = util.time();
                 room.mspt = performance.now() - start;
+				room.lagComp = Math.max(1, room.mspt/room.cycleSpeed)
                 const border = 2150
                 if (c.serverName.includes("Boss Rush") && c.ISSIEGE) {
                     entities.forEach(entity => {
