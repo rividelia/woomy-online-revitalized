@@ -71,7 +71,7 @@ const PI_2 = 1.5707963267948966;
 
 function ultraFastAtan2(y, x) {
     // Fast NaN protection
-    if (y !== y || x !== x) return 0;
+    if (y !== y || x !== x) return null;
     if (x === 0) return y > 0 ? PI_2 : y < 0 ? -PI_2 : 0;
     
     const absY = y < 0 ? -y : y;
@@ -4313,7 +4313,7 @@ const Chain = Chainf;
 					if (c.SANDBOX && entity.sandboxId !== body.sandboxId) return;
 
 					switch (entity.type) {
-						case 'tank': case 'miniboss': case 'crasher': break;
+						case "drone": case "minion": case 'tank': case 'miniboss': case 'crasher': break;
 						case 'food': if (IGNORE_SHAPES) return; break;
 						default: return;
 					}
@@ -4376,7 +4376,7 @@ const Chain = Chainf;
 				}
 
 				// Throttle expensive target acquisition.
-				if (++this.tick > 20) {
+				if (++this.tick > 0) {
 					this.tick = 0;
 					let range = this.body.aiSettings.SKYNET ? this.body.fov : this.body.master.fov;
 					range *= this.body.aiSettings.BLIND ? 2/3 : 1
@@ -4401,6 +4401,7 @@ const Chain = Chainf;
 
 				const tracking = this.body.topSpeed;
 				this.lead = timeOfImpact({ x: diffX, y: diffY }, target.velocity, tracking);
+				if(this.lead === Infinity) this.lead = 0;
 
 				// Mutate and return the pre-allocated output object.
 				this.output.target.x = diffX + this.lead * target.velocity.x;
@@ -5790,7 +5791,6 @@ const Chain = Chainf;
                         this.sandboxId = this.master.sandboxId;
                     }
                 }
-                this.isInGrid = false;
                 /*this.activation = (() => {
                     let active = true,
                         timer = ran.irandom(15);
@@ -7587,7 +7587,6 @@ const Chain = Chainf;
                             let gx = gun.offset * Math.cos(gun.direction + gun.angle + gun.body.facing) + (1.35 * gun.length - gun.width * gun.settings.size / 2) * Math.cos(gun.angle + this.facing),
                                 gy = gun.offset * Math.sin(gun.direction + gun.angle + gun.body.facing) + (1.35 * gun.length - gun.width * gun.settings.size / 2) * Math.sin(gun.angle + this.facing);
                             gun.fire(gx, gy, this.skill);
-							console.log(gun)
                         }
                     }
                     // Explosions, phases and whatnot
