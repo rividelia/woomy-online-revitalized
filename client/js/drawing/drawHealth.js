@@ -94,7 +94,7 @@ function drawHealth(x, y, instance, ratio, alpha) {
 			const color = getColor(instance.color);
 			const len = measureText(msg[0], (size * nameRatio) - padding);
 
-			let msgFade = Date.now()-msg[1]
+			let msgFade = performance.now()-msg[1]
 			if(msgFade < msgFadeTime){
 				msgFade /= msgFadeTime
 			}else if((config.chatMessageDuration*1000)-msgFade < msgFadeTime ){

@@ -4376,7 +4376,7 @@ const Chain = Chainf;
 				}
 
 				// Throttle expensive target acquisition.
-				if (++this.tick > 0) {
+				if (++this.tick > room.cycleSpeed) {
 					this.tick = 0;
 					let range = this.body.aiSettings.SKYNET ? this.body.fov : this.body.master.fov;
 					range *= this.body.aiSettings.BLIND ? 2/3 : 1

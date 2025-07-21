@@ -595,20 +595,18 @@ let socketInit = function () {
 				case "cs": {
 					let arr = global.chatMessages.get(m[1])
 					if (arr === undefined) {
-						arr = [[m[0], Date.now()]]
+						arr = [[m[0], performance.now()]]
 						global.chatMessages.set(m[1], arr)
 					} else {
-						arr.push([m[0], Date.now()])
+						arr.push([m[0], performance.now()])
 					}
 					function removeChatMessage() {
 						arr.shift();
 						if (arr.length === 0) {
 							global.chatMessages.delete(m[1])
-						} else {
-							setTimeout(removeChatMessage, config.chatMessageDuration * 1000)
 						}
 					}
-					setTimeout(removeChatMessage, config.chatMessageDuration * 1000)
+					setTimeout(removeChatMessage, config.chatMessageDuration * 1000 - 50)
 				}
 				break;
 				case "nrid": // new room id - happens bc host can dc from manager
