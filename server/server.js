@@ -4406,7 +4406,7 @@ const Chain = Chainf;
 					this.targetLock = null;
 					this.output.main = false;
 					this.output.fire = false;
-					return this.output;
+					return {};
 				}
 
 				const target = this.targetLock;
@@ -9874,13 +9874,13 @@ function flatten(data, out, playerContext = null) {
                         } break;
 						case "as": // short for asset
 							const values = Object.values(assets)
-							const s = new Set()
-							for(let i = 0; i < values.length; i+=2){
+							for(let i = 0; i < values.length/2; i++){
 								this.talk("as",
 									values.length/2,
 									values[i].id,
 									values[i].data,
 									values[i].info.path2d,
+									values[i].info.path2dDiv,
 									values[i].info.image,
 									values[i].info.p1,
 									values[i].info.p2,

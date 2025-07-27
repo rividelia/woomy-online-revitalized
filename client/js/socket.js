@@ -606,11 +606,12 @@ let socketInit = function () {
 						await setAsset(m[1], m[2], 
 							{
 								path2d:m[3],
-								image:m[4],
-								p1:m[5],
-								p2:m[6],
-								p3:m[7],
-								p4:m[8]
+								path2dDiv:m[4],
+								image:m[5],
+								p1:m[6],
+								p2:m[7],
+								p3:m[8],
+								p4:m[9]
 							})
 						window.loadedAssets++;
 						window.loadingTextTooltip = `(${window.loadedAssets}/${m[0]})`

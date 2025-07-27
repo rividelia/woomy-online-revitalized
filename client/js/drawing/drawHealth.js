@@ -51,6 +51,8 @@ function drawHealth(x, y, instance, ratio, alpha) {
 		}
 	}
 
+	
+
 	if (instance.nameplate) {
 		let fill = instance.nameColor;
 		let nameRatio = ((ratio * instance.size) / 20)*fade;

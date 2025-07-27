@@ -769,16 +769,33 @@ let gameDraw = function (ratio) {
 						drawMobileButton(7, x, y, size * 2, size, global._mobileFiring[0] === 4 ? "Main Firing" : "Alt Firing");
 						drawMobileButton(8, x * 2.25, y, size, size, "Q");
 					}
+
+					// AIM INDICATOR
+					if(global._mobileFiring[1]){
+						global.aimAlpha = Math.min(0.3, global.aimAlpha+0.03)
+					}else{
+						global.aimAlpha = Math.max(0, global.aimAlpha-0.02)
+					}
+					if (!global._died && global.aimAlpha > 0) {
+						const alphaFade = global.aimAlpha/.3
+						ctx.strokeStyle = color.guiwhite;
+						ctx.lineWidth = 2*alphaFade;
+						ctx.globalAlpha = global.aimAlpha;
+						drawGuiLine(global.player.x + global._screenWidth / 2, global.player.y + global._screenHeight / 2, (global._target._x*alphaFade) + global._screenWidth / 2, (global._target._y*alphaFade) + global._screenHeight / 2);
+						drawGuiCircle((global._target._x*alphaFade) + global._screenWidth / 2, (global._target._y*alphaFade) + global._screenHeight / 2, 4*alphaFade);
+						ctx.globalAlpha = 1;
+					}
 				}
 			}
-		};
-		scaleScreenRatio(1 / ratio, true);
+			;
+			scaleScreenRatio(1 / ratio, true);
+		}
 	}
 
 	// EFFECTS
 	if (global.player.pepperspray.apply || global.player.pepperspray.blurMax > 0) {
 		ctx.filter = `blur(${global.player.pepperspray.blurAmount}px)`;
-		ctx.drawImage(c, 0, 0, global._screenWidth, global._screenHeight);
+		ctx.drawImage(global._canvas._cv, 0, 0, global._screenWidth, global._screenHeight);
 		ctx.filter = "none";
 		if (!global.player.pepperspray.apply && global.player.pepperspray.blurAmount != 0) {
 			global.player.pepperspray.blurAmount--

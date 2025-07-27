@@ -85,8 +85,9 @@ let mockups = {
 			}
 			// Recursively process guns and their shapes
 			for(let i = 0; i < rawMockup.guns.length; i++){
-				rawMockup.guns[i].color = rawMockup.guns[i]._assetMagic?loadAsset(rawMockup.guns[i].color._assetMagic, rawMockup.guns[i].color.id):rawMockup.guns[i].color
+				rawMockup.guns[i].color = rawMockup.guns[i].color?._assetMagic?loadAsset(rawMockup.guns[i].color._assetMagic, rawMockup.guns[i].color.id):rawMockup.guns[i].color
 			}
+
 			// Recursively process turrets and their shapes
 			if (rawMockup.turrets) {
 				rawMockup.turrets = rawMockup.turrets.map(cleanUpDefaults);

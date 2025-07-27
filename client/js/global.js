@@ -11,6 +11,7 @@ const global = {
 		x: 0,
 		y: 0
 	},
+	aimAlpha: 0,
 	_mapType: 0,
 	_killTracker: 0,
 	_forceTwiggle: false,

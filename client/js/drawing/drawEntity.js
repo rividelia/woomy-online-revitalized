@@ -24,6 +24,17 @@ let drawEntity = function () {
 			context.drawImage(sides, -radius * sides.p1, -radius * sides.p2, radius * sides.p3, radius * sides.p4);
 			context.restore();
 			return;
+		} else if(sides instanceof Path2D){
+			let radiusDiv = sides.path2dDiv
+			radius /= radiusDiv;
+			context.save();
+			context.translate(centerX, centerY);
+			context.scale(radius, radius);
+			context.lineWidth /= radius;
+			context.rotate(angle);
+			context.stroke(sides);
+			if (fill) context.fill(sides);
+			context.restore();
 		} else if (typeof sides === "object") {
 			if (!sides[2]) { // svg
 				let radiusDiv = sides[1] || 1

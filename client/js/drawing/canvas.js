@@ -584,7 +584,6 @@ global._canvas = new (class Canvas {
 		let width = global._screenWidth / innerWidth;
 		let height = global._screenHeight / innerHeight;
 		for (let touch of e.changedTouches) {
-			console.log(touch)
 			let mpos = {
 				x: touch.clientX * width,
 				y: touch.clientY * height

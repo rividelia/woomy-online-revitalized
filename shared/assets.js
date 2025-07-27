@@ -20,6 +20,7 @@ async function setAsset(key, data, info={}){
 		data: data,
 		info: {
 			path2d: !!info.path2d,
+			path2dDiv: info.path2dDiv||1,
 			image: !!info.image,
 			p1: info.p1||1,
 			p2: info.p2||1,
@@ -27,9 +28,11 @@ async function setAsset(key, data, info={}){
 			p4: info.p4||1
 		}
 	}
+
 	if(globalThis.window){
 		if(obj.info.path2d === true){
 			obj.data = new Path2D(obj.data);
+			obj.data.path2dDiv = obj.info.path2dDiv
 		}else if(obj.info.image === true){
 			const img = new Image();
 			img.src = obj.data
