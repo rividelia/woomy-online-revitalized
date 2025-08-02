@@ -72,8 +72,7 @@ function getTurnCredentials(username) {
 
 // The main request handler that decides what to do with each request
 const handleRequest = (req, res) => {
-	const url = new URL(req.url, `http://${req.headers.host}`);
-	const pathname = url.pathname;
+	const pathname = req.url?.split('?')[0] || '/';
 
 	console.log(`[Request] ${req.method} ${pathname}`);
 
