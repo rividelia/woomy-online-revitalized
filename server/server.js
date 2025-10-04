@@ -5919,7 +5919,7 @@ const Chain = Chainf;
                 this.rainbowLoop = this.rainbowLoop.bind(this);
                 this.keyFEntity = ["square", 5, 0, false];
                 this.isActive = true
-				this.deactivationTimer = 30;
+				this.deactivationTimer = -1;
                 this.deactivation = function(){
 					this.deactivationTimer -= 1;
                     if (this.deactivationTimer < 0) {
