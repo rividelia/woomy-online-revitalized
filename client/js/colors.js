@@ -55,7 +55,7 @@ let themes = {
 		"white": "#DBDBDB",
 		"guiblack": "#000000",
 		"paletteSize": 10,
-		"border": 0.65
+		"border": 0.575
 	},
 	"classic": {
 		"teal": "#8EFFFB",

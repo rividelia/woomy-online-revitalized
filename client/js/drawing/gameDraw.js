@@ -166,24 +166,22 @@ let gameDraw = function (ratio) {
 	
 	    if(len === 0) continue;
 	
+		const laserColor = getColor(laser.color);
+		const darkColor = getColorDark(laserColor);
 	    const angle = Math.atan2(dy, dx);
 	    let width = laser.width * ratio * laser.fade;
 	
+	    ctx.save();
+	    ctx.translate(lx1, ly1);
+	    ctx.rotate(angle);
 	    if (config.performanceMode === false && config.animatedLasers === true) {
-	        const laserColor = getColor(laser.color);
-	        const darkColor = getColorDark(laserColor);
-		
-	        ctx.save();
-	        ctx.translate(lx1, ly1);
-	        ctx.rotate(angle);
-		
-	        const layers = 12;
+	        const layers = 32;
 	        for(let i = 0; i < layers; i++){
 	            const t = i / (layers - 1);
 	            const layerWidth = (width * (1+(i/layers)*Math.random())) * (1 - t * 0.7);
 	            let lcolor;
 	            if(t < 0.5) {
-	                const blend = t * 2;
+	                const blend = t/(config.borderChunk*ratio);
 	                lcolor = mixColors(darkColor, color.white, blend);
 	            } else {
 	                const blend = (t - 0.5) * 2;
@@ -193,28 +191,21 @@ let gameDraw = function (ratio) {
 	            ctx.fillStyle = lcolor;
 	            ctx.globalAlpha = .15 + .25/layers
 				ctx.beginPath();
+				ctx.arc(len, 0, layerWidth/1.75, 0, Math.PI * 2);
+				ctx.arc(0, 0, layerWidth/1.25, 0, Math.PI * 2);
 	            ctx.rect(0, -layerWidth / 2, len, layerWidth);
-				ctx.arc(len, 0, layerWidth/1.5, 0, Math.PI * 2);
-				ctx.arc(0, 0, layerWidth, 0, Math.PI * 2);
 				ctx.fill();
 			}
-		
-	        ctx.restore();
-	        ctx.globalAlpha = 1;
 	    } else {
-	        ctx.save();
-	        ctx.translate(lx1, ly1);
-	        ctx.rotate(angle);
-	        ctx.fillStyle = getColor(laser.color);
+	        ctx.fillStyle = laserColor
 	        ctx.globalAlpha = 0.35;
 			ctx.beginPath()
 	        ctx.rect(0, -width / 2, len, width);
 	        ctx.arc(len, 0, width/1.5, 0, Math.PI*2);
 			ctx.arc(0, 0, width, 0, Math.PI*2)
 			ctx.fill();
-			ctx.restore();
-	        ctx.globalAlpha = 1;
 	    }
+		ctx.restore();
 	}
 
 	// NAME PLATES

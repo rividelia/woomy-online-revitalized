@@ -143,6 +143,34 @@ function serveStaticFile(req, res) {
 	tryPath(primaryPath);
 }
 
+// Submission times for connection estimates
+let initAverage = 0;
+let initSum = 0;
+let initSubmissions = 0;
+let estabAverage = 0;
+let estabSum = 0;
+let estabSubmissions = 0;
+function submitConnectionTime(type, time){
+	if(type === "init"){
+		if(initSubmissions === 15){
+			initSubmissions /= 2;
+			initSum /= 2;
+		}
+		initSum += time;
+		initSubmissions += 1;
+		initAverage = initSum/initSubmissions;
+		return initAverage
+	} else if(type === "estab"){
+		if(estabSubmissions === 15){
+			estabSubmissions /= 2;
+			initSum /= 2;
+		}
+		estabSum += time;
+		estabSubmissions += 1;
+		estabAverage = estabSum/estabSubmissions;
+		return estabAverage
+	}
+}
 
 // The main request handler that decides what to do with each request
 const handleRequest = (req, res) => {
@@ -222,6 +250,42 @@ const handleRequest = (req, res) => {
         } else if (pathname === "/api/getJsFileList"){
 			res.writeHead(200, { "Content-Type": "application/json"});
 			res.end(JSON.stringify(fs.readdirSync(path.join(__dirname, "client", "js"), {recursive:true}).filter(p=>p.endsWith(".js"))))
+			return;
+		} else if (pathname === "/api/submitConnectionTime"){
+			if (req.method !== "POST") {
+				res.writeHead(405, { "Content-Type": "text/plain" });
+				res.end("Invalid method. Use POST.");
+				return;
+			}
+			let body = "";
+			req.on("data", chunk => body += chunk);
+			req.on("end", () => {
+				try {
+					const { type, time } = JSON.parse(body);
+					if(type !== "init" && type !== "estab"){
+						res.writeHead(422, {"Content-Type": "text/plain"})
+						res.end("Invalid submission type")
+						return;
+					}
+					let result = submitConnectionTime(type, time)
+					if(result !== undefined){
+						res.writeHead(200)
+						res.end()
+					}else{
+						res.writeHead(400)
+						res.end()
+					}
+					return;
+				} catch (err) {
+					console.error("Error in /api/submitConnectionTime:", err);
+					res.writeHead(422, { "Content-Type": "text/plain" });
+					res.end("Internal server error.");
+				}
+			});
+			return;
+		}else if (pathname === "/api/getConnectionTimes"){
+			res.writeHead(200, { "Content-Type": "application/json" })
+			res.end(`{"init":${initAverage}, "estab":${estabAverage}}`)
 			return;
 		}
 	}

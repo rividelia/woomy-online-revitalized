@@ -750,8 +750,10 @@ let socketInit = function () {
 						convert.fastGui();
 						convert.lasers();
 						convert.data();
-						global.player._cx = lerp(global.player._cx||cam.x, cam.x, config.movementSmoothing);
-						global.player._cy = lerp(global.player._cy||cam.y, cam.y, config.movementSmoothing);
+						// If the camera is slightly slower it gives the feeling that the player is moving more/faster
+						// Its better if the camera is behind the real spot because it has to "react" which has a certain feel
+						global.player._cx = lerp(global.player._cx||cam.x, cam.x, config.movementSmoothing*.7);
+						global.player._cy = lerp(global.player._cy||cam.y, cam.y, config.movementSmoothing*.7);
 						global.player._view = cam.FoV;
 						if (isNaN(global.player._renderv) || global.player._renderv === 0) global.player._renderv = 2000;
 						metrics._lastlag = metrics._lag;

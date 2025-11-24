@@ -4154,9 +4154,7 @@ const Chain = Chainf;
                 if (input.alt) {
                     for (let i = 0; i < this.body.guns.length; i++) {
                         let gun = this.body.guns[i];
-                        let gx = gun.offset * Math.cos(gun.direction + gun.angle + gun.body.facing) + (1.35 * gun.length - gun.width * gun.settings.size / 2) * Math.cos(gun.angle + this.body.facing),
-                            gy = gun.offset * Math.sin(gun.direction + gun.angle + gun.body.facing) + (1.35 * gun.length - gun.width * gun.settings.size / 2) * Math.sin(gun.angle + this.body.facing);
-                        gun.fire(gx, gy, this.body.skill);
+                        gun.fire(this.body.skill);
                     }
                     this.body.kill();
                     let gun = this.body.master.guns[this.body.gunIndex];
@@ -4269,21 +4267,6 @@ const Chain = Chainf;
                             altOverride: true
                         };
                     }
-                }
-            }
-        }
-        ioTypes.skipBomb = class extends IO {
-            constructor(body) {
-                super(body);
-                this.time = 15;
-                this.initialAngle = body.velocity.direction;
-            }
-            think(input) {
-                this.time--;
-                if (this.time <= 0) {
-                    this.time = 15;
-                    let angle = this.initialAngle + (Math.random() * (Math.PI / 2) - (Math.PI / 4));
-                    this.body.velocity = new Vector(Math.cos(angle) * this.body.initialBulletSpeed, Math.sin(angle) * this.body.initialBulletSpeed);
                 }
             }
         }
@@ -5341,12 +5324,12 @@ const Chain = Chainf;
                     this.canShoot = false
                 }
             }
-			getEnd(speedVec = {x: 0, y: 0}, lerpComp = 2){
-				const gx = this.offset * Math.cos(this.direction + this.angle + this.body.facing) + (1.35 * this.length - this.width * this.settings.size / 2) * Math.cos(this.angle + this.master.facing)
-				const gy = this.offset * Math.sin(this.direction + this.angle + this.body.facing) + (1.35 * this.length - this.width * this.settings.size / 2) * Math.sin(this.angle + this.master.facing)
+			getEnd(speedVec = {x: 0, y: 0}, lerpComp = 0){
+				const gx = this.offset * Math.cos(this.direction + this.angle + this.body.facing) + (this.length - this.width * this.settings.size / 2) * Math.cos(this.angle + this.body.facing)
+				const gy = this.offset * Math.sin(this.direction + this.angle + this.body.facing) + (this.length - this.width * this.settings.size / 2) * Math.sin(this.angle + this.body.facing)
 				return {
-					x: this.master.x + this.master.size * gx - (this.length*speedVec.x) * lerpComp,
-					y: this.master.y + this.master.size * gy - (this.length*speedVec.y) * lerpComp
+					x: this.body.x + this.body.size * gx - (this.length*speedVec.x) * lerpComp,
+					y: this.body.y + this.body.size * gy - (this.length*speedVec.y) * lerpComp
 				}
 			}
             newRecoil() {
@@ -5402,8 +5385,6 @@ const Chain = Chainf;
                                     shootPermission = false;
                                 }
                             }
-                            let gx = this.offset * Math.cos(this.direction + this.angle + this.body.facing) + (1.35 * this.length - this.width * this.settings.size / 2) * Math.cos(this.angle + this.body.facing),
-                                gy = this.offset * Math.sin(this.direction + this.angle + this.body.facing) + (1.35 * this.length - this.width * this.settings.size / 2) * Math.sin(this.angle + this.body.facing);
                             if (shootPermission && this.cycle >= 1) {
                                 /*
                                     * This exists, and should not be removed!!
@@ -5419,10 +5400,10 @@ const Chain = Chainf;
                                 } else {
                                     if (!this.body.variables.emp || this.body.variables.emp == undefined || !this.body.master.variables.emp || this.body.master.variables.emp == undefined) {
                                         if (this.onFire) {
-                                            this.onFire(this, [gx, gy, sk]);
+                                            this.onFire(this, sk);
                                         } else {
                                             for (let i = 0; i < this.timesToFire; i++) {
-                                                this.fire(gx, gy, sk);
+                                                this.fire(sk);
                                             }
                                         }
                                     }
@@ -5455,7 +5436,7 @@ const Chain = Chainf;
 					})
                 }
             }
-            fire(gx, gy, sk) {
+            fire(sk) {
                 if (this.shootOnce) {
                     this.canShoot = false;
                 }
@@ -5469,24 +5450,23 @@ const Chain = Chainf;
                 sd *= Math.PI / 180;
                 let speed = (this.negRecoil ? -1 : 1) * this.settings.speed * c.runSpeed * sk.spd * (1 + ss);
                 let s = new Vector(speed * Math.cos(this.angle + this.body.facing + sd), speed * Math.sin(this.angle + this.body.facing + sd));
-                if (this.body.velocity.length) {
-                    let extraBoost = Math.max(0, s.x * this.body.velocity.x + s.y * this.body.velocity.y) / this.body.velocity.length / s.length;
+                const vel = this.body.velocity;
+                if (vel.length) {
+                    let extraBoost = Math.max(0, s.x * vel.x + s.y * vel.y) / vel.length / s.length;
                     if (extraBoost) {
                         let len = s.length;
-                        s.x += this.body.velocity.length * extraBoost * s.x / len;
-                        s.y += this.body.velocity.length * extraBoost * s.y / len;
+                        s.x += vel.length * extraBoost * s.x / len;
+                        s.y += vel.length * extraBoost * s.y / len;
                     }
                 }
 
 				if(this.bulletTypes[0].TYPE === "laser"){
 					new Laser(this, this.getEnd(), 0, typeof this.bulletTypes[1] === "object" ? Object.assign(this.bulletTypes[0], this.bulletTypes[1]) : this.bulletTypes[0])
 					return;
-				}else{
-                	let o = new Entity(this.getEnd(s), this.master.master);
-                	o.velocity = s;
-                	o.initialBulletSpeed = speed;
+                }else{
+                    let o = new Entity(this.getEnd(s, .6), this.master.master);
                 	this.bulletInit(o);
-                	o.coreSize = o.SIZE;
+					o.velocity = s;
                 	return o;
 				}
             }
@@ -5778,9 +5758,9 @@ const Chain = Chainf;
 				this.followGun = this.settings.FOLLOW_GUN ?? true;
 		        this.layer = this.settings.LAYER ?? this.master?.LAYER ?? 0;
 
-		        this.angle = (angle || 0) + Math.PI / 2;
-				if(this.followGun !== true && this.master){
-					this.angle += this.master.facing
+		        this.angle = (angle??0)+Math.PI/2
+				if(this.followGun !== true && this.master && this.gun){
+					this.angle = this.master.facing + this.gun.angle
 				}
             	this.startPoint = this.gun ? this.gun.getEnd() : { x: startPos.x, y: startPos.y };
 			
@@ -5807,8 +5787,6 @@ const Chain = Chainf;
 				let angle = this.angle;
 				if(this.followGun === true){
                 	if(this.gun){
-                	    // Anchor start to muzzle without the velocity/lerp offset so
-                	    // the laser follows the gun precisely and doesn't 'snap'.
                 	    this.startPoint = this.gun.getEnd({x:0,y:0}, 0);
                 	    angle += this.gun.angle;
 						if(this.gun.master){
@@ -5853,21 +5831,23 @@ const Chain = Chainf;
 				const collectedHits = [];
 			
 		        // 1. Traverse grid to gather all potential targets along the laser's path
+				if(this.endPoint.x === this.startPoint.x) this.endPoint.x += 1;
+				if(this.endPoint.y === this.startPoint.y) this.endPoint.y += 1;
 		        const dx = this.endPoint.x - this.startPoint.x;
 		        const dy = this.endPoint.y - this.startPoint.y;
 		        let cellX = Math.floor(this.startPoint.x / (1 << grid.cellShift));
 		        let cellY = Math.floor(this.startPoint.y / (1 << grid.cellShift));
 		        const endCellX = Math.floor(this.endPoint.x / (1 << grid.cellShift));
 		        const endCellY = Math.floor(this.endPoint.y / (1 << grid.cellShift));
-		        const stepX = dx === 0 ? 0 : (dx > 0 ? 1 : -1);
-		        const stepY = dy === 0 ? 0 : (dy > 0 ? 1 : -1);
+		        const stepX = (dx > 0 ? 1 : -1);
+		        const stepY = (dy > 0 ? 1 : -1);
 		        const cellSize = 1 << grid.cellShift;
-		        const tDeltaX = dx === 0 ? Infinity : Math.abs(cellSize / dx);
-		        const tDeltaY = dy === 0 ? Infinity : Math.abs(cellSize / dy);
+		        const tDeltaX = Math.abs(cellSize / dx);
+		        const tDeltaY = Math.abs(cellSize / dy);
 		        const nextBoundaryX = (cellX + (stepX > 0 ? 1 : 0)) * cellSize;
 		        const nextBoundaryY = (cellY + (stepY > 0 ? 1 : 0)) * cellSize;
-		        let tMaxX = dx === 0 ? Infinity : Math.abs((nextBoundaryX - this.startPoint.x) / dx);
-		        let tMaxY = dy === 0 ? Infinity : Math.abs((nextBoundaryY - this.startPoint.y) / dy);
+		        let tMaxX = Math.abs((nextBoundaryX - this.startPoint.x) / dx);
+		        let tMaxY = Math.abs((nextBoundaryY - this.startPoint.y) / dy);
 			
                 const processCell = (cx, cy) => {
                     const cellContent = grid.getCell(cx * cellSize, cy * cellSize);
@@ -6242,10 +6222,7 @@ const Chain = Chainf;
             }
             life() {
                 // New version of life, let's hope this fucking works
-                if (this.SIZE !== this.coreSize) {
-                    this.coreSize = this.SIZE;
-                    this.refreshFOV();
-                }
+                this.refreshFOV();
                 let control = {
                     altOverride: false
                 }, faucet = {};
@@ -6404,7 +6381,6 @@ const Chain = Chainf;
                 }
                 if (set.SIZE != null) {
                     this.SIZE = set.SIZE * this.squiggle;
-                    if (this.coreSize == null) this.coreSize = this.SIZE;
                 }
                 if (set.LAYER != null) this.LAYER = set.LAYER;
                 this.settings.skillNames = set.STAT_NAMES || 6;
@@ -6619,7 +6595,6 @@ const Chain = Chainf;
                         });
                     if (set.SIZE != null) {
                         this.SIZE = set.SIZE * this.squiggle;
-                        if (this.coreSize == null) this.coreSize = this.SIZE;
                     }
                     if (set.SKILL != null && set.SKILL.length > 0) {
                         if (set.SKILL.length !== 10) throw ("Invalid skill raws!");
@@ -6760,7 +6735,7 @@ const Chain = Chainf;
                 }
             }
             refreshBodyAttributes() {
-                let speedReduce = Math.pow(this.size / (this.coreSize || this.SIZE), 1);
+                let speedReduce = Math.pow(this.size / this.SIZE, 1);
                 this.acceleration = c.runSpeed * this.ACCELERATION / speedReduce;
                 if (this.settings.reloadToAcceleration) this.acceleration *= this.skill.acl;
                 this.topSpeed = c.runSpeed * this.SPEED * this.skill.mob / speedReduce;
@@ -6777,7 +6752,7 @@ const Chain = Chainf;
                 this.pushability = this.PUSHABILITY;
             }
             refreshFOV() {
-                this.fov = 250 * this.FOV * Math.sqrt(this.size) * (1 + .003 * this.skill.level);
+                this.fov = 250 * this.FOV * (this.size**.5) * (1 + .003 * this.skill.level);
             }
             bindToMaster(position, bond) {// size, x, y, angle (deg), turn range, layer
                 this.bond = bond;
@@ -6806,7 +6781,7 @@ const Chain = Chainf;
             }
             get size() {
                 //if (this.bond == null) return (this.coreSize || this.SIZE) * (1 + this.skill.level / 60);
-                if (this.bond == null) return (this.coreSize || this.SIZE) * (1 + (this.skill.level > c.SKILL_CAP ? c.SKILL_CAP : this.skill.level) / 60);
+                if (this.bond == null) return this.SIZE * (1 + (this.skill.level > c.SKILL_CAP ? c.SKILL_CAP : this.skill.level) / 60);
                 return this.bond.size * this.bound.size;
             }
             get mass() {
@@ -7816,8 +7791,7 @@ const Chain = Chainf;
                     for (let i = 0; i < this.guns.length; i++) {
                         let gun = this.guns[i];
                         if (gun.shootOnDeath) {
-							const gunEnd = gun.getEnd()
-                            gun.fire(gunEnd.x, gunEnd.y, this.skill);
+                            gun.fire(this.skill);
                         }
                     }
                     // Explosions, phases and whatnot
@@ -11531,6 +11505,12 @@ function flatten(data, out, playerContext = null) {
                     });
                 }
 
+				for(let entity of entities) {
+				    if (!entity.isActive) return true;
+                    entitiesLiveLoop(entity)
+                    entity.collisionArray.length = 0;
+                }
+
 				grid.clear();
                 entities.filterToChain(entity => {
 					entity.deactivation();
@@ -11549,12 +11529,6 @@ function flatten(data, out, playerContext = null) {
 				lasers.forEach((laser)=>{
 					laser.tick();
 				})
-
-				for(let entity of entities) {
-				    if (!entity.isActive) return true;
-                    entitiesLiveLoop(entity)
-                    entity.collisionArray.length = 0;
-                }
 
                 room.wallCollisions = []
 
