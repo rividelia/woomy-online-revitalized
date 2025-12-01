@@ -83,10 +83,12 @@ function updateRoomInfo() {
 roomInfoSettingsMaxPlayerInput.oninput = function(){
 	maxPlayers = Number(roomInfoSettingsMaxPlayerInput.value)
 }
+roomInfoSettingsMaxPlayerInput.value = maxPlayers;
 
 roomInfoSettingsMaxBotsInput.oninput = function(){
 	maxBots = Number(roomInfoSettingsMaxBotsInput.value)
 }
+roomInfoSettingsMaxBotsInput.value = maxBots;
 
 const nameInput = document.getElementById("nameInput")
 nameInput.oninput = function () {
