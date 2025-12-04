@@ -1762,11 +1762,11 @@ let drawEntity = function () {
 
 
 			if (path) {
-	            ctx.stroke(path);
+	            if (!p.borderless) ctx.stroke(path);
 	            if (p.fill) ctx.fill(path);
 	        } else {
 	            if (p.loop) ctx.closePath();
-	            ctx.stroke();
+	            if (!p.borderless) ctx.stroke();
 	            if (p.color >= 1000) {
 	                ctx.save();
 	                ctx.clip();

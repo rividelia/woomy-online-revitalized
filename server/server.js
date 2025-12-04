@@ -2217,6 +2217,7 @@ const Chain = Chainf;
                         shape: p.shape,
                         fill: p.fill,
 						stroke: p.stroke,
+						borderless: p.borderless,
                         loop: p.loop,
                         isAura: p.isAura,
                         rpm: p.rpm,
@@ -5584,6 +5585,7 @@ const Chain = Chainf;
                 this.color = info.COLOR || -1;
                 this.fill = info.FILL != undefined ? info.FILL : true;
 				this.stroke = info.STROKE != undefined ? info.STROKE : true;
+				this.borderless = info.BORDERLESS != undefined ? info.BORDERLESS : false;
                 this.loop = info.LOOP != undefined ? info.LOOP : true;
                 this.isAura = info.IS_AURA != undefined ? info.IS_AURA : false;
                 this.ring = info.RING;
@@ -5593,7 +5595,7 @@ const Chain = Chainf;
 				this.lockRot = info.LOCK_ROT != undefined ? info.LOCK_ROT : true;
 				this.scaleSize = info.SCALE_SIZE != undefined ? info.SCALE_SIZE : true;
 				this.tankOrigin = info.TANK_ORIGIN != undefined ? info.TANK_ORIGIN : true;
-				if(this.isAura === true) this.stroke = false;
+				if(this.isAura === true) this.borderless = false;
             }
         }
         let bots = [];

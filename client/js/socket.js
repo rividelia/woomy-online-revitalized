@@ -867,23 +867,27 @@ let socketInit = function () {
 					break;
 				case "am":
 					_anims.clear();
-					for(let i = 0; i < m.length; i+=9){
-						let index = i;
+					let i = 0;
+					while(i < m.length){
 						const prev = _anims.get(m[i]);
 						const arr = prev || [];
 						if(!prev) _anims.set(m[i], arr)
+						i++;
+						
+						const readValue = () => {
+							const val = m[i++];
+							return val === ASSET_MAGIC ? loadAsset(ASSET_MAGIC, m[i++]) : val;
+						};
+						
 						arr.push({
-							index: m[++index],
-							size: m[++index],
-							x: m[++index],
-							y: m[++index],
-							angle: m[++index],
-							layer: m[++index],
-							shape: m[++index] === ASSET_MAGIC ? loadAsset(ASSET_MAGIC, m[++index]) :
-								typeof m[index] === "string" ? JSON.parse(m[index]) :
-									m[index],
-							color: m[++index] === ASSET_MAGIC ? loadAsset(ASSET_MAGIC, m[++index]) :
-								m[index]
+							index: m[i++],
+							size: m[i++],
+							x: m[i++],
+							y: m[i++],
+							angle: m[i++],
+							layer: m[i++],
+							shape: readValue(),
+							color: readValue()
 						})
 					}
 					break;
